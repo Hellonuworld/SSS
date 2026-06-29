@@ -2141,19 +2141,9 @@ window.addEventListener('resize', () => {
       inquiryForm.reset();
       resetTurnstile();
       setInquiryStatus('Thank you. Your inquiry has been submitted.', 'success');
-    }).catch(function () {
-      fetch(inquiryEndpoint, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: data
-      }).then(function () {
-        inquiryForm.reset();
-        resetTurnstile();
-        setInquiryStatus('Thank you. Your inquiry has been sent.', 'success');
-      }).catch(function () {
-        resetTurnstile();
-        setInquiryStatus('Unable to submit your inquiry. Please try WhatsApp or email us directly.', 'error');
-      });
+    }).catch(function (error) {
+      resetTurnstile();
+      setInquiryStatus(error.message || 'Unable to submit your inquiry. Please try WhatsApp or email us directly.', 'error');
     }).finally(function () {
       inquirySubmit.disabled = false;
       inquirySubmit.textContent = 'Submit Inquiry';
