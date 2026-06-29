@@ -4,6 +4,11 @@
   var navigation = document.querySelector(".site-nav");
   var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
   var form = document.querySelector("#inquiry-form");
+  var isSnapPage = document.documentElement.classList.contains("snap-scroll");
+
+  if (isSnapPage && !window.location.hash && "scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
 
   function updateHeader() {
     header.classList.toggle("is-scrolled", window.scrollY > 24);
@@ -51,4 +56,7 @@
 
   updateHeader();
   window.addEventListener("scroll", updateHeader, { passive: true });
+  window.addEventListener("pageshow", function () {
+    if (isSnapPage && !window.location.hash) window.scrollTo(0, 0);
+  });
 })();
