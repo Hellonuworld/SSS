@@ -7,3 +7,8 @@ initial-version - 副本 (2).html
 *.log
 Thumbs.db
 .DS_Store
+node_modules/
+dist/
+.astro/
+.vercel/
+.netlify/

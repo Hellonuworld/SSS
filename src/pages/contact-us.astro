@@ -1,0 +1,9 @@
+---
+import LegacyPage from "../components/LegacyPage.astro";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const html = readFileSync(join(process.cwd(), "contact-us.html"), "utf-8");
+---
+
+<LegacyPage html={html} />

@@ -1,0 +1,19 @@
+---
+const { html } = Astro.props;
+
+const normalized = html
+  .replaceAll('href="css/', 'href="/css/')
+  .replaceAll("href='css/", "href='/css/")
+  .replaceAll('src="js/', 'src="/js/')
+  .replaceAll("src='js/", "src='/js/")
+  .replaceAll('src="images/', 'src="/images/')
+  .replaceAll("src='images/", "src='/images/")
+  .replaceAll('src="videos/', 'src="/videos/')
+  .replaceAll("src='videos/", "src='/videos/")
+  .replaceAll('src="webflow/', 'src="/webflow/')
+  .replaceAll("src='webflow/", "src='/webflow/")
+  .replaceAll('href="images/', 'href="/images/')
+  .replaceAll("href='images/", "href='/images/");
+---
+
+<Fragment set:html={normalized} />
