@@ -617,6 +617,69 @@ body::-webkit-scrollbar { /* WebKit */
 .inquiry-status.is-success {
   color: #0e5e5e;
 }
+.inquiry-success-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 560;
+  display: flex;
+  padding: 4vh 4vw;
+  align-items: center;
+  justify-content: center;
+  background: rgba(31,35,57,.62);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 240ms ease, visibility 0s linear 240ms;
+}
+.inquiry-success-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.inquiry-success-dialog {
+  width: min(560px, 92vw);
+  padding: 34px;
+  border: 1px solid #2d325b;
+  background: #f9c5d1;
+  color: #2d325b;
+}
+.inquiry-success-dialog h2 {
+  margin: 0 0 16px;
+  font-family: Formulacondensed, sans-serif;
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+.inquiry-success-dialog p {
+  margin: 0 0 14px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+.inquiry-success-contact {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0 22px;
+  font-family: Markpro, sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.inquiry-success-contact a {
+  color: #2d325b;
+  font-weight: 700;
+}
+.inquiry-success-confirm {
+  min-height: 44px;
+  padding: 0 24px;
+  border: 0;
+  background: #2d325b;
+  color: #fff;
+  font-family: Markpro, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
 .chat-notice {
   position: fixed;
   right: 3vw;
@@ -1385,6 +1448,20 @@ body[class*="theme-"] .nav-link.w--current {
       </form>
     </div>
   </div>
+  <div class="inquiry-success-modal" id="inquiry-success-modal" role="dialog" aria-modal="true" aria-labelledby="inquiry-success-title">
+    <div class="inquiry-success-dialog">
+      <h2 id="inquiry-success-title">Thank You</h2>
+      <p>Your inquiry has been submitted successfully. Our sales team will reply within 24 hours.</p>
+      <p>If your request is urgent, please contact us directly by phone, WeChat or WhatsApp.</p>
+      <div class="inquiry-success-contact">
+        <div>Phone / WhatsApp: <a href="https://wa.me/8613867898840" target="_blank" rel="noopener noreferrer">+86-13867898840</a></div>
+        <div>Phone: <a href="tel:+8657427659555">+86-574-27659555</a></div>
+        <div>Email: <a href="mailto:vip@still-steel.com">vip@still-steel.com</a></div>
+        <div>WeChat: +86-13867898840</div>
+      </div>
+      <button class="inquiry-success-confirm" id="confirm-inquiry-success" type="button">Confirm</button>
+    </div>
+  </div>
   <div class="chat-notice" id="chat-notice" role="status">Online chat is being prepared.</div>
   <div class="tablet-wrap">
     <div class="tea-section">
@@ -2084,10 +2161,13 @@ window.addEventListener('resize', () => {
   var gradeSelect = document.getElementById('inquiry-grade');
   var inquiryStatus = document.getElementById('inquiry-status');
   var inquirySubmit = inquiryForm ? inquiryForm.querySelector('.inquiry-submit') : null;
+  var successModal = document.getElementById('inquiry-success-modal');
+  var successConfirm = document.getElementById('confirm-inquiry-success');
   var chatButton = document.getElementById('open-chat');
   var chatNotice = document.getElementById('chat-notice');
   var chatTimer = null;
   var inquiryEndpoint = 'https://script.google.com/macros/s/AKfycbwen3e7U2bCYYhp9fiCSLIsVHv2KyuXkNoq650i7cYfw9Fl1LqVsIg04sT8Vv8aUfOobQ/exec';
+  var savedContactKey = 'stillSteelInquiryContact';
   var gradeByAnchor = {
     'stainless-201': '201 / S20100',
     'stainless-304': '304 / S30400',
@@ -2100,6 +2180,8 @@ window.addEventListener('resize', () => {
   function openInquiry() {
     var activeAnchor = location.hash.replace('#', '') || 'stainless-201';
     gradeSelect.value = gradeByAnchor[activeAnchor] || '201 / S20100';
+    restoreSavedContact();
+    setInquiryStatus('', '');
     modal.classList.add('is-open');
     document.getElementById('inquiry-name').focus();
   }
@@ -2121,13 +2203,67 @@ window.addEventListener('resize', () => {
     }
   }
 
+  function showSuccessModal() {
+    modal.classList.remove('is-open');
+    successModal.classList.add('is-open');
+    successConfirm.focus();
+  }
+
+  function closeSuccessModal() {
+    successModal.classList.remove('is-open');
+    modal.classList.remove('is-open');
+    openButton.focus();
+  }
+
+  function restoreSavedContact() {
+    try {
+      var saved = JSON.parse(window.localStorage.getItem(savedContactKey) || '{}');
+      ['name', 'company', 'email', 'phone'].forEach(function (field) {
+        var input = inquiryForm.elements[field];
+        if (input && saved[field] && !input.value) {
+          input.value = saved[field];
+        }
+      });
+    } catch (error) {}
+  }
+
+  function saveContactForNextInquiry(data) {
+    var contact = {
+      name: data.get('name') || '',
+      company: data.get('company') || '',
+      email: data.get('email') || '',
+      phone: data.get('phone') || ''
+    };
+    try {
+      window.localStorage.setItem(savedContactKey, JSON.stringify(contact));
+    } catch (error) {}
+  }
+
+  function getClientIp() {
+    return fetch('https://api.ipify.org?format=json', { cache: 'no-store' })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (result) {
+        return result.ip || '';
+      })
+      .catch(function () {
+        return '';
+      });
+  }
+
   openButton.addEventListener('click', openInquiry);
   closeButton.addEventListener('click', closeInquiry);
+  successConfirm.addEventListener('click', closeSuccessModal);
+  successModal.addEventListener('click', function (event) {
+    if (event.target === successModal) closeSuccessModal();
+  });
   modal.addEventListener('click', function (event) {
     if (event.target === modal) closeInquiry();
   });
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape' && modal.classList.contains('is-open')) closeInquiry();
+    if (event.key === 'Escape' && successModal.classList.contains('is-open')) closeSuccessModal();
   });
 
   inquiryForm.addEventListener('submit', function (event) {
@@ -2144,24 +2280,34 @@ window.addEventListener('resize', () => {
 
     data.set('material', material || selectedGrade);
     data.set('page', location.href);
+    data.set('pageTitle', document.title);
+    data.set('referrer', document.referrer || '');
+    data.set('userAgent', navigator.userAgent || '');
+    data.set('language', navigator.language || '');
+    data.set('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+    data.set('submittedAtLocal', new Date().toString());
     data.set('source', 'still-steel.com inquiry modal');
 
     inquirySubmit.disabled = true;
     inquirySubmit.textContent = 'Submitting...';
     setInquiryStatus('Submitting your inquiry...', '');
 
-    fetch(inquiryEndpoint, {
+    getClientIp().then(function (clientIp) {
+      data.set('clientIp', clientIp);
+      return fetch(inquiryEndpoint, {
       method: 'POST',
       body: data
+      });
     }).then(function (response) {
       return response.json();
     }).then(function (result) {
       if (!result.ok) {
         throw new Error(result.error || 'Unable to submit your inquiry. Please try again later.');
       }
-      inquiryForm.reset();
+      saveContactForNextInquiry(data);
       resetTurnstile();
-      setInquiryStatus('Thank you. Your inquiry has been submitted.', 'success');
+      inquiryForm.reset();
+      showSuccessModal();
     }).catch(function (error) {
       resetTurnstile();
       setInquiryStatus(error.message || 'Unable to submit your inquiry. Please try WhatsApp or email us directly.', 'error');
