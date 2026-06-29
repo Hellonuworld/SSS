@@ -2319,14 +2319,19 @@ window.addEventListener('resize', () => {
   });
 
   chatButton.addEventListener('click', function () {
-    window.clearTimeout(chatTimer);
-    chatNotice.classList.add('is-visible');
-    chatTimer = window.setTimeout(function () {
-      chatNotice.classList.remove('is-visible');
-    }, 2600);
+    if (window.$crisp) {
+      window.$crisp.push(['do', 'chat:open']);
+    } else {
+      window.clearTimeout(chatTimer);
+      chatNotice.classList.add('is-visible');
+      chatTimer = window.setTimeout(function () {
+        chatNotice.classList.remove('is-visible');
+      }, 2600);
+    }
   });
 })();
 </script>
+<script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="f6927999-1852-45d4-8fa3-d190ad8ed757";(function(){var d=document;var s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 </body>
 </html>
 
