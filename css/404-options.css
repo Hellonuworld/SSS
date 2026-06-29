@@ -54,7 +54,7 @@ a {
   min-height: 42px;
   align-items: center;
   justify-content: center;
-  padding: 0 1.35rem;
+  padding: 0 1rem;
   border: 1px solid currentColor;
   margin-right: -1px;
   font-family: "Mark Pro", Arial, sans-serif;
@@ -193,8 +193,13 @@ a {
 }
 
 .brand-404 .steel-logo {
-  width: min(28vw, 390px);
+  width: min(17vw, 230px);
   top: 47%;
+}
+
+.brand-404 .icon-logo {
+  aspect-ratio: 1;
+  object-fit: contain;
 }
 
 .brand-404 .error-code {
