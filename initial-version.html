@@ -562,6 +562,23 @@ body::-webkit-scrollbar { /* WebKit */
   height: 1px;
   overflow: hidden;
 }
+.inquiry-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  color: #2d325b;
+  font-family: Markpro, sans-serif;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.inquiry-consent input {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  accent-color: #2d325b;
+  flex: 0 0 auto;
+}
 .inquiry-submit-row {
   display: flex;
   margin-top: 20px;
@@ -1353,6 +1370,10 @@ body[class*="theme-"] .nav-link.w--current {
           <label for="inquiry-website">Website</label>
           <input id="inquiry-website" name="website" tabindex="-1" autocomplete="off">
         </div>
+        <label class="inquiry-consent">
+          <input id="inquiry-consent" name="consent" type="checkbox" value="true" required>
+          <span>I agree that Still Steel may use this inquiry information to reply by email, phone or WhatsApp.</span>
+        </label>
         <div class="inquiry-security">
           <div class="cf-turnstile" data-sitekey="0x4AAAAAADsh40iHke7xwaQ3" data-action="inquiry"></div>
         </div>
