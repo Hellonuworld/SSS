@@ -12,3 +12,10 @@ dist/
 .astro/
 .vercel/
 .netlify/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
